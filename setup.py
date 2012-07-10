@@ -32,6 +32,7 @@ setup(name='gs.cache',
     zip_safe=True,
     install_requires=[
         'setuptools',
+        'redis',
         # -*- Extra requirements: -*-
     ],
     entry_points="""
