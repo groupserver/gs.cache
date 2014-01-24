@@ -1,15 +1,24 @@
+# -*- coding: utf-8 -*-
+##############################################################################
+#
+# Copyright © 2014 OnlineGroups.net and Contributors.
+# All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+###############################################################################
 #
 # This code has test cases in tests/test_cache.py.
 # Modifications without a supporting test case will be rejected.
 #
 
-from zope.interface.declarations import implements
-from zope.interface import Interface
-from threading import RLock
-from cPickle import dumps, loads
 from gs.config import Config, getInstanceId
 from gs.cache.backends import NullCache, RedisCache
-import datetime
 import logging
 log = logging.getLogger('gs.cache')
 
@@ -19,20 +28,24 @@ try:
 except ImportError:
     haveredis = False
 
+
 class BackendError(Exception):
     pass
 
+
 caches = {}
+
+
 def get_cache(cache_name, instance_id=None):
     if not instance_id:
         instance_id = getInstanceId()
 
     # prepend the cache_name with the instance_id to make it unique across
     # instances
-    cache_name = instance_id+"::"+cache_name
+    cache_name = instance_id + "::" + cache_name
 
     # yes, we have a cache of caches :-)
-    if caches.has_key(cache_name):
+    if cache_name in caches:
         return caches[cache_name]
 
     config = Config(instance_id)
@@ -49,12 +62,14 @@ def get_cache(cache_name, instance_id=None):
     else:
         raise BackendError(u'No cache backend implemented for "%s"' % backend)
 
-    log.info(u'Intialising cache "%s" using backend "%s"' % (cache_name,backend))
+    log.info(u'Intialising cache "%s" using backend "%s"' % (cache_name,
+                                                                backend))
 
     return caches[cache_name]
 
-# complex as it looks, this is the main cache decorator
+
 def cache(cachename, cachekeyfunc, expiry=None):
+    # complex as it looks, this is the main cache decorator
     def cache_decorator(f):
         def do_cache(*args):
             cache = get_cache(cachename)
@@ -63,9 +78,6 @@ def cache(cachename, cachekeyfunc, expiry=None):
             if not result:
                 result = f(*args)
                 cache.set(cache_key, result, expiry)
-
-            return result # do_cache
-
-        return do_cache # cache_decorator
-
-    return cache_decorator # simplecache
+            return result  # do_cache
+        return do_cache  # cache_decorator
+    return cache_decorator  # simplecache
