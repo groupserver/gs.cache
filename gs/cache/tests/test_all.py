@@ -15,7 +15,8 @@
 from __future__ import absolute_import, unicode_literals
 from unittest import TestSuite, main as unittest_main
 from gs.cache.tests.getcache import TestGetCache
-testCases = (TestGetCache, )
+from gs.cache.tests.backends import TestRedis
+testCases = (TestGetCache, TestRedis, )
 
 
 def load_tests(loader, tests, pattern):

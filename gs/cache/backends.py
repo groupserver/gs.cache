@@ -62,7 +62,7 @@ class RedisCache(object):
         self.backend = backend
         self.cache_name = cache_name
 
-    def set(self, key, object, expiry=None):
+    def set(self, key, value, expiry=None):
         try:
             if not self.__thread_lock.acquire(False):
                 m = "Cache ({0}), not adding object ({1}) to cache, would "\
@@ -70,7 +70,7 @@ class RedisCache(object):
                 log.info(m)
                 return False
             fullKey = self.cache_name + '%' + key
-            self.backend.set(fullKey, dumps(object))
+            self.backend.set(fullKey, dumps(value))
             if expiry:
                 self.backend.expire(fullKey, expiry)
         finally:
@@ -78,7 +78,6 @@ class RedisCache(object):
                 self.__thread_lock.release()
             except:
                 pass
-
         return True
 
     def has_key(self, key):
