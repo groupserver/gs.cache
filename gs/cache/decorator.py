@@ -12,6 +12,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ###############################################################################
+from __future__ import absolute_import, unicode_literals
 from .getcache import get_cache
 
 
