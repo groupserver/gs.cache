@@ -15,43 +15,21 @@
 # This code has test cases in tests/test_cache.py.
 # Modifications without a supporting test case will be rejected.
 #
-from cPickle import dumps, loads
+from __future__ import absolute_import, unicode_literals
+from logging import getLogger
+log = getLogger('gs.cache')
+import sys
+if (sys.version_info >= (3, )):
+    from pickle import dumps, loads
+else:
+    from cPickle import dumps, loads  # lint:ok
 from threading import RLock
-from zope.interface.declarations import implements
-from zope.interface import Interface
-import logging
-log = logging.getLogger('gs.cache')
+from zope.interface.declarations import implementer
+from .interfaces import ICache
 
 
-class ICache(Interface):
-
-    def set(key, object):
-        """ Add an object to the cache.
-
-        """
-
-    def has_key(key):
-        """ Check to see if an object is in the cache.
-
-        """
-
-    def get(key):
-        """ Get an object from the cache by key.
-
-        """
-
-    def remove(key):
-        """ Remove an object from the cache by key.
-
-        """
-
-    def clear():
-        """Clear all instances from a cache
-        """
-
-
+@implementer(ICache)
 class NullCache(object):
-    implements(ICache)
 
     def __init__(self, backend=None, cache_name=None):
         return
@@ -76,8 +54,8 @@ class NullCache(object):
         return
 
 
+@implementer(ICache)
 class RedisCache(object):
-    implements(ICache)
     __thread_lock = RLock()
 
     def __init__(self, backend, cache_name):
