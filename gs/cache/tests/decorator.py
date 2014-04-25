@@ -28,7 +28,7 @@ class FauxCache(object):
     def get(self, *args):
         retval = None
         if self.getHit:
-            retval = value
+            retval = value + '-cache'
         return retval
 
 
@@ -55,7 +55,7 @@ class TestDecorator(TestCase):
             return value
 
         r1 = fn()
-        # The fn shoul be run on a cache-miss.
+        # The fn should be run on a cache-miss.
         self.assertTrue(hasRun)
         # The value should be set in the cache.
         self.assertEqual(1, f.set.call_count)
@@ -88,4 +88,5 @@ class TestDecorator(TestCase):
         self.assertFalse(hasRun)
         # If the cache is hit then nothing in the cache should be set
         self.assertEqual(0, f.set.call_count)
-        self.assertEqual(value, r1)
+        # The value from the cache should be returned.
+        self.assertEqual(value + '-cache', r1)
