@@ -4,4 +4,4 @@ include version.py
 include *.txt
 global-exclude *.pyc
 prune-dir gs/cache/tests/__pycache__/
-\ninclude *.rst
+include *.rst
